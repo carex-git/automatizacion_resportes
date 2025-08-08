@@ -18,6 +18,7 @@ password = "xrjw xnuz jtox qrmv"
 # Archivos a enviar
 archivo_excel = base_dir + "/reporte_vendedoras.xlsx"
 archivo_imagen = base_dir + "/grafico_ejecucion_vendedor.png"
+archivo_imagen_bi = base_dir + "/output/dashboard_consolidado_2025-08-08.jpg"
 
 # Crear mensaje
 mensaje = MIMEMultipart()
@@ -35,6 +36,10 @@ with open(archivo_excel, "rb") as adj:
     mensaje.attach(parte)
 
 # Adjuntar imagen
+with open(archivo_imagen_bi, "rb") as img:
+    imagen = MIMEImage(img.read(), name=os.path.basename(archivo_imagen_bi))
+    mensaje.attach(imagen)
+    
 with open(archivo_imagen, "rb") as img:
     imagen = MIMEImage(img.read(), name=os.path.basename(archivo_imagen))
     mensaje.attach(imagen)
