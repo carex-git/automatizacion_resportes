@@ -7,8 +7,8 @@ import xlwings as xw
 
 
 class TasaUpdater:
-    def __init__(self):
-        self.BASE_DIR =  r"C:\Users\aprsistemas\Desktop\trabajo\automatizacion_resportes"
+    def __init__(self,base_dir):
+        self.BASE_DIR = base_dir
         self.DATA_DIR = os.path.join(self.BASE_DIR, "data")
         self.INPUT_FILENAME = "Carex COL Reporte Vendedor.xlsx"
         self.INPUT_PATH = os.path.join(self.DATA_DIR, self.INPUT_FILENAME)
@@ -85,20 +85,18 @@ class TasaUpdater:
         app.quit()
         print("✅ Archivo actualizado sin corromper.")
 
-    @classmethod
-    def main(cls):
-        updater = cls()
-        if not os.path.exists(updater.INPUT_PATH):
-            print(f"❌ Archivo no encontrado: {updater.INPUT_PATH}")
+    def main(self):
+        if not os.path.exists(self.INPUT_PATH):
+            print(f"❌ Archivo no encontrado: {self.INPUT_PATH}")
             return
 
-        updater.hacer_backup(updater.INPUT_PATH)
+        self.hacer_backup(self.INPUT_PATH)
 
         fecha_actual = int(datetime.today().strftime('%Y%m%d'))
-        eur_usd = updater.obtener_tasa_eur_usd()
-        cop_usd = updater.obtener_tasa_cop_usd()
+        eur_usd = self.obtener_tasa_eur_usd()
+        cop_usd = self.obtener_tasa_cop_usd()
 
         if eur_usd and cop_usd:
-            updater.actualizar_excel_sin_corromper(updater.INPUT_PATH, fecha_actual, cop_usd, eur_usd)
+            self.actualizar_excel_sin_corromper(self.INPUT_PATH, fecha_actual, cop_usd, eur_usd)
         else:
             print("❌ No se pudieron obtener todas las tasas.")

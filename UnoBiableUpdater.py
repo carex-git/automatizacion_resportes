@@ -7,8 +7,8 @@ import win32com.client
 from pathlib import Path
 
 class UnoBiableUpdater:
-    def __init__(self):
-        self.BASE_DIR =  r"C:\Users\aprsistemas\Desktop\trabajo\automatizacion_resportes"
+    def __init__(self,base_dir):
+        self.BASE_DIR =  base_dir
         self.DATA_DIR = os.path.join(self.BASE_DIR, "data")
         self.INPUT_FILENAME = "Carex COL Reporte Vendedor.xlsx"
         self.INPUT_PATH = os.path.join(self.DATA_DIR, self.INPUT_FILENAME)
@@ -263,8 +263,3 @@ class UnoBiableUpdater:
         print("🧹 Limpieza final...")
         self.limpiar_procesos_excel()
         print("🏁 Proceso terminado")
-
-if __name__ == "__main__":
-    updater = UnoBiableUpdater()
-    updater.main()
-    

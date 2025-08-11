@@ -6,14 +6,14 @@ from email.mime.text import MIMEText
 import os
 
 class ReportEmailSender:
-    def __init__(self, remitente, password, destinatarios, asunto, cuerpo):
+    def __init__(self, base_dir, remitente, password, destinatarios, asunto, cuerpo):
         self.remitente = remitente
         self.password = password
         self.destinatarios = destinatarios
         self.asunto = asunto
         self.cuerpo = cuerpo
 
-        base_dir = r"C:\Users\aprsistemas\Desktop\trabajo\automatizacion_resportes"
+        base_dir = base_dir
         self.output_dir = os.path.join(base_dir, "output")
 
     def send_mail(self):

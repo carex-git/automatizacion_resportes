@@ -11,8 +11,8 @@ from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
 
 class CarexDashboard:
-    def __init__(self):
-        self.BASE_DIR = r"C:\Users\aprsistemas\Desktop\trabajo\automatizacion_resportes"
+    def __init__(self,base_dir):
+        self.BASE_DIR = base_dir
         self.DATA_DIR = os.path.join(self.BASE_DIR, "data")
         self.OUTPUT_DIR = os.path.join(self.BASE_DIR, "output")
         os.makedirs(self.OUTPUT_DIR, exist_ok=True)
