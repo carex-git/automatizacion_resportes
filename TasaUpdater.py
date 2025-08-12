@@ -16,12 +16,6 @@ class TasaUpdater:
         self.BACKUP_DIR = os.path.join(self.DATA_DIR, "backups")
         os.makedirs(self.BACKUP_DIR, exist_ok=True)
 
-    def hacer_backup(self, path):
-        fecha_str = datetime.today().strftime("%Y%m%d_%H%M%S")
-        backup_path = os.path.join(self.BACKUP_DIR, f"backup_{fecha_str}.xlsx")
-        shutil.copy2(path, backup_path)
-        print(f"📂 Copia de seguridad creada: {backup_path}")
-        return backup_path
 
     def obtener_tasa_eur_usd(self):
         url = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
@@ -90,8 +84,6 @@ class TasaUpdater:
             print(f"❌ Archivo no encontrado: {self.INPUT_PATH}")
             return
 
-        self.hacer_backup(self.INPUT_PATH)
-
         fecha_actual = int(datetime.today().strftime('%Y%m%d'))
         eur_usd = self.obtener_tasa_eur_usd()
         cop_usd = self.obtener_tasa_cop_usd()
@@ -100,3 +92,12 @@ class TasaUpdater:
             self.actualizar_excel_sin_corromper(self.INPUT_PATH, fecha_actual, cop_usd, eur_usd)
         else:
             print("❌ No se pudieron obtener todas las tasas.")
+
+
+if __name__ == '__main__':
+    try:
+        TasaUpdater(base_dir="C:/Users/aprsistemas/Desktop/trabajo/automatizacion_resportes/").main()
+    except Exception as e:
+        print(f"❌ Error inesperado: {e}")
+    input("Presiona Enter para salir...")
+
