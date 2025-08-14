@@ -16,7 +16,7 @@ class UnoBiableUpdater:
         os.makedirs(self.BACKUP_DIR, exist_ok=True)
         
         # Configuración para timeouts
-        self.MAX_REFRESH_TIME = 20  # 5 minutos máximo para actualizar
+        self.MAX_REFRESH_TIME = 10  # 5 minutos máximo para actualizar
         self.RETRY_ATTEMPTS = 2
     
     def verificar_archivo_disponible(self):

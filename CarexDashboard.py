@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
+import math
 
 class CarexDashboard:
     def __init__(self,base_dir):
@@ -409,9 +410,10 @@ class CarexDashboard:
     # -------------------------
     # Combinar imágenes en rejilla 2 columnas (dinámico)
     # -------------------------
+    # Reemplaza la sección del título en tu método combine_images_into_single_report
+
     def combine_images_into_single_report(self, image_bytes_list, cols=2, padding=40):
         print("🖼️ Combinando gráficos en un reporte consolidado (rejilla)...")
-        # Filtrar None
         image_bytes_list = [b for b in image_bytes_list if b is not None]
         if not image_bytes_list:
             print("❌ No hay imágenes para combinar.")
@@ -421,43 +423,78 @@ class CarexDashboard:
         widths, heights = zip(*(im.size for im in pil_images))
         max_w = max(widths)
         max_h = max(heights)
-        
-        scale_factor = 5.3  # 30% más alto
-        max_h = int(max_h * scale_factor)
-        max_w = int(max_w * scale_factor)  # opcional si quieres aumentar también el ancho
 
+        scale_factor = 9.3
+        max_h = int(max_h * scale_factor)
+        max_w = int(max_w * scale_factor)
 
         rows = math.ceil(len(pil_images) / cols)
+        
+        # CAMBIO 1: Más espacio para el título (aumentar de 120 a 200)
+        title_space = 2800
         final_w = cols * max_w + (cols + 1) * padding
-        final_h = rows * max_h + (rows + 1) * padding + 120  # espacio para título
+        final_h = rows * max_h + (rows + 1) * padding + title_space
 
         final = Image.new("RGB", (final_w, final_h), "white")
         draw = ImageDraw.Draw(final)
 
-        # título
+        # CAMBIO 2: Aumentar el tamaño de fuente y mejorar la carga
         try:
-            font_path = "arial.ttf"
-            title_font = ImageFont.truetype(font_path, 48)
+            # Intentar diferentes rutas de fuente
+            font_paths = [
+                "arial.ttf", 
+                "Arial.ttf", 
+                "/System/Library/Fonts/Arial.ttf",  # macOS
+                "/Windows/Fonts/arial.ttf",         # Windows
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"  # Linux
+            ]
+            title_font = None
+            for font_path in font_paths:
+                try:
+                    title_font = ImageFont.truetype(font_path, 400)  # CAMBIO: tamaño más moderado pero visible
+                    break
+                except:
+                    continue
+            
+            if title_font is None:
+                title_font = ImageFont.load_default()
         except Exception:
             title_font = ImageFont.load_default()
-        title = f"Reporte Consolidado - {self.FECHA_ACTUAL}"
+
+        title = f"REPORTE CONSOLIDADO CAREX - {self.FECHA_ACTUAL}"  # CAMBIO 3: Título más descriptivo
         bbox = draw.textbbox((0, 0), title, font=title_font)
         w_t = bbox[2] - bbox[0]
-        draw.text(((final_w - w_t) / 2, 20), title, fill="black", font=title_font)
+        h_t = bbox[3] - bbox[1]
 
-        # pegar imágenes en rejilla
+        # CAMBIO 4: Mejor posicionamiento del título
+        title_x = (final_w - w_t) / 2
+        title_y = 400  # Más espacio desde arriba
+        
+        # CAMBIO 5: Agregar sombra al título para mayor visibilidad
+        # Sombra
+        draw.text((title_x + 2, title_y + 2), title, fill="gray", font=title_font)
+        # Título principal
+        draw.text((title_x, title_y), title, fill="#003366", font=title_font)  # Color corporativo
+
+        # CAMBIO 6: Agregar línea separadora
+        line_y = title_y + h_t + 20
+        draw.line([(padding, line_y), (final_w - padding, line_y)], fill="#003366", width=3)
+
+        # CAMBIO 7: Ajustar posición de imágenes para dar más espacio al título
+        images_start_y = title_y + h_t + 50
+        
+        # Pegar imágenes debajo del título
         for idx, im in enumerate(pil_images):
             row = idx // cols
             col = idx % cols
             x = padding + col * (max_w + padding)
-            y = padding + row * (max_h + padding) + 80
+            y = images_start_y + row * (max_h + padding)
             final.paste(im.resize((max_w, max_h)), (int(x), int(y)))
 
         out_path = os.path.join(self.OUTPUT_DIR, f"dashboard_consolidado_{self.FECHA_ACTUAL}.jpg")
         final.save(out_path, "JPEG", quality=95)
         print(f"✅ Dashboard consolidado guardado en: {out_path}")
         return out_path
-
     # -------------------------
     # Excel report (igual que antes)
     # -------------------------

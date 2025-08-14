@@ -21,16 +21,9 @@ if __name__ == "__main__":
     eliminar_carpeta(os.path.join(base_dir, 'output'))
     eliminar_carpeta(os.path.join(base_dir, 'data/backups'))
     
-    if config.get('tasa_updater', True):
-        print("== Ejecutando TasaUpdater ==")
-        TasaUpdater(base_dir=base_dir).main()
-        
-    if config.get('uno_biable_updater', True):
-        print("== Ejecutando Updater UnoBiable ==")
-        UnoBiableUpdater(base_dir=base_dir).main()
-        
+   
     CarexDashboard(base_dir=base_dir).generate_all_reports()
-    ReportEmailSender(
+    """ ReportEmailSender(
         base_dir=base_dir,
         remitente=config["remitente"],
         password=config["password"],
@@ -38,3 +31,4 @@ if __name__ == "__main__":
         asunto=config["asunto"],
         cuerpo=config["cuerpo"]
     ).send_mail()
+"""
