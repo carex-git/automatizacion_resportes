@@ -176,18 +176,6 @@ class UnoBiableUpdater:
             except:
                 pass
     
-    def restaurar_backup(self, backup_path):
-        """Restaura el archivo desde el backup si algo sale mal."""
-        if backup_path and os.path.exists(backup_path):
-            try:
-                shutil.copy2(backup_path, self.INPUT_PATH)
-                print(f"🔄 Archivo restaurado desde backup: {backup_path}")
-                return True
-            except Exception as e:
-                print(f"❌ Error restaurando backup: {e}")
-                return False
-        return False
-    
     def main(self):
         print("🚀 Iniciando actualización de UnoBiable...")
         
@@ -208,12 +196,6 @@ class UnoBiableUpdater:
         
         # 3️⃣ Remover solo lectura
         self.remover_solo_lectura()
-        
-        # 4️⃣ Crear backup
-        backup_path = self.hacer_backup()
-        if not backup_path:
-            print("❌ No se pudo crear backup. Abortando.")
-            return
         
         # 5️⃣ Intentar actualizar con diferentes métodos
         success = False
@@ -249,15 +231,6 @@ class UnoBiableUpdater:
             else:
                 print("⚠️ El archivo podría estar en solo lectura")
                 self.remover_solo_lectura()
-                
-        else:
-            print("❌ Falló la actualización después de todos los intentos")
-            print("🔄 Restaurando desde backup...")
-            
-            if self.restaurar_backup(backup_path):
-                print("✅ Archivo restaurado exitosamente")
-            else:
-                print("❌ Error restaurando archivo")
         
         # 7️⃣ Limpieza final
         print("🧹 Limpieza final...")

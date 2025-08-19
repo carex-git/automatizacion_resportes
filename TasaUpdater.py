@@ -2,7 +2,6 @@ import requests
 from datetime import datetime
 import os
 import xml.etree.ElementTree as ET
-import shutil
 import xlwings as xw
 
 

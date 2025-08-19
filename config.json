@@ -1,12 +1,12 @@
 {
-    "uno_biable_updater" : true,
+    "uno_biable_updater" : false,
     "tasa_updater" : true,
     "base_dir": "C:/Users/aprsistemas/Desktop/trabajo/automatizacion_resportes/",
     "remitente": "cm090457@gmail.com",
-    "password": "xrjw xnuz jtox qrmv",
+    "password": "",
     "destinatarios": [
         "cristian.marin5062@soyuco.edu.co"
     ],
   "asunto": "Reporte automático",
-  "cuerpo": "Hola,\n\nAdjunto encontrarás el reporte en Excel y las imágenes generadas.\n\nSALUDOS"
+  "cuerpo": "Hola,\n\nAdjunto encontrarás el reporte en Excel y las imágenes generadas."
 }
