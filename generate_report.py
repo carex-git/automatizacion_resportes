@@ -11,15 +11,19 @@ with open("config.json", "r", encoding="utf-8") as f:
     config = json.load(f)
 
 def eliminar_carpeta(path):
-    if os.path.exists(path) and os.path.isdir(path):
-        shutil.rmtree(path)
+    if os.path.exists(path):
+        for f in os.listdir(path):
+            fp = os.path.join(path, f)
+            if os.path.isfile(fp):
+                os.remove(fp)
+            elif os.path.isdir(fp):
+                shutil.rmtree(fp)
 
 if __name__ == "__main__":
     
     base_dir = config['base_dir']
     
     eliminar_carpeta(os.path.join(base_dir, 'output'))
-    eliminar_carpeta(os.path.join(base_dir, 'data/backups'))
     
     if config.get('tasa_updater', True):
         print("== Ejecutando TasaUpdater ==")

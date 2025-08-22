@@ -2,8 +2,8 @@
     "uno_biable_updater" : false,
     "tasa_updater" : true,
     "base_dir": "C:/Users/aprsistemas/OneDrive - CAREX/Escritorio/trabajo/automatizacion_resportes",
-    "remitente": "cm090457@gmail.com",
-    "password": "xrjw xnuz jtox qrmv",
+    "remitente": "",
+    "password": "",
     "destinatarios": [
         "cristian.marin5062@soyuco.edu.co"
     ],

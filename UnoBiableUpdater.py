@@ -1,5 +1,6 @@
 import os
 import shutil
+import psutil
 from datetime import datetime
 import time
 import xlwings as xw
@@ -12,8 +13,6 @@ class UnoBiableUpdater:
         self.DATA_DIR = os.path.join(self.BASE_DIR, "data")
         self.INPUT_FILENAME = "Carex COL Reporte Vendedor.xlsx"
         self.INPUT_PATH = os.path.join(self.DATA_DIR, self.INPUT_FILENAME)
-        self.BACKUP_DIR = os.path.join(self.DATA_DIR, "backups")
-        os.makedirs(self.BACKUP_DIR, exist_ok=True)
         
         # Configuración para timeouts
         self.MAX_REFRESH_TIME = 10  # 5 minutos máximo para actualizar
@@ -45,7 +44,7 @@ class UnoBiableUpdater:
     def limpiar_procesos_excel(self):
         """Limpia procesos de Excel que puedan estar colgados."""
         try:
-            import psutil
+            
             for proc in psutil.process_iter(['pid', 'name']):
                 if proc.info['name'] and 'excel' in proc.info['name'].lower():
                     try:

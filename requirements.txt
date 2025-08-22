@@ -1,0 +1,8 @@
+pandas
+numpy
+openpyxl
+pyinstaller
+matplotlib
+plotly
+xlwings
+psutil

@@ -115,19 +115,32 @@ class CarexDashboard:
         return float(valor)
 
     @staticmethod
-    def _dividir_nombre(nombre, max_len=20):
-        partes = str(nombre).split()
-        linea = ""
-        lineas = []
-        for parte in partes:
-            if len(linea + parte) < max_len:
-                linea += parte + " "
+    def _dividir_nombre_v(nombre):
+        palabras = nombre.split()
+        
+        if len(palabras) >= 2 and any(p.upper() in ['MARIA', 'MARÍA'] for p in palabras):     
+            # Encontrar el índice de "Maria" o "María"
+            try:
+                idx = next(i for i, p in enumerate(palabras) if p.upper() in ['MARIA', 'MARÍA'])
+            except StopIteration:
+                # Esto es un fallback por si no se encuentra (aunque la condición `any()` lo evita)
+                return ""
+
+            # Lógica para seleccionar el nombre siguiente o anterior
+            if idx < len(palabras) - 1:
+                # Si "Maria" no es la última palabra, coger la siguiente
+                return f'{palabras[idx]} {palabras[idx+1]}'
+            elif idx > 0:
+                # Si "Maria" es la última palabra, coger la anterior
+                return f'{palabras[idx-1]} {palabras[idx]}'
             else:
-                lineas.append(linea.strip())
-                linea = parte + " "
-        if linea:
-            lineas.append(linea.strip())
-        return "\n".join(lineas)
+                # Si "Maria" está sola o en una posición donde no hay otra palabra
+                return palabras[idx]
+        
+        elif len(palabras) > 2:
+            return palabras[2]
+        else:
+            return nombre
 
     def _cargar_datos_vendedores(self):
         # carga las mismas hojas usadas antes, aplicando conversión si es necesario
@@ -223,6 +236,10 @@ class CarexDashboard:
 
         df_resultado = pd.DataFrame(resultados)
         return df_resultado
+    
+
+    
+            
 
     def _generar_grafico_vendedores_memoria(self, df_resultado, anual=False):
         # genera el plot (matplotlib) y devuelve BytesIO
@@ -238,10 +255,10 @@ class CarexDashboard:
         bar2 = ax.bar(x, faltante, width=0.4, bottom=ejecucion, label="% Faltante", color="#1f4e79")
 
         titulo = "Ejecución vs Faltante por Vendedor - " + ("Anual" if anual else f"Mes {self.MES_ACTUAL_NOMBRE}")
-        ax.set_title(titulo, fontsize=14, fontweight='bold')
+        ax.set_title(titulo, fontsize=24, fontweight='bold', color='#3d2ca0')
         ax.set_ylabel("Porcentaje")
         ax.set_xticks(x)
-        ax.set_xticklabels([self._dividir_nombre(v) for v in df_resultado["Vendedor"]])
+        ax.set_xticklabels([self._dividir_nombre_v(v) for v in df_resultado["Vendedor"]])
 
         ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.25), ncol=2, fontsize=10)
 
@@ -257,7 +274,7 @@ class CarexDashboard:
                         ha='center',
                         va='center',
                         color='white' if rects is bar2 else 'black',
-                        fontsize=9,
+                        fontsize=11,
                         fontweight='bold'
                     )
 
@@ -277,13 +294,13 @@ class CarexDashboard:
          top_paises_anual, top_paises_mensual, budget_anual, ejecutado_anual,
          budget_mensual, ejecutado_mensual) = analysis_data
 
-        colores_carex = ['#003366', '#ff7f0e', "#3d2ca0", '#d62728', '#9467bd']
+        colores_carex = ["#008000", "#eafb00", "#3d2ca0", '#d62728', '#9467bd']
 
         def create_plot_bytes(fig, title, width, height):
             fig.update_layout(
                 title_text=f"<b>{title}</b>",
                 title_x=0.5,
-                title_font_size=18,
+                title_font_size=24,
                 height=height,
                 width=width,
                 plot_bgcolor='rgba(240,240,240,0.8)',
@@ -301,19 +318,36 @@ class CarexDashboard:
             mode="gauge+number",
             value=ejecutado_anual,
             number={'valueformat': '$,.2f', 'font': {'size': 40}},
-            title={'text': f"Venta Acumulada USD Anual {self.ANIO_ACTUAL}", 'font': {'size': 14}},
-            gauge={'axis': {'range': [0, budget_anual]}, 'bar': {'color': "#003366"}}
+            gauge={'axis': {'range': [0, budget_anual]}, 'bar': {'color': "#008000"}}
         ))
-        gauge_anual_bytes = create_plot_bytes(fig_gauge_anual, "Gauge Anual", 600, 350)
+        fig_gauge_anual.add_annotation(
+            x=1.1,
+            y=0.08,
+            text=f'${14.53}mill',
+            showarrow=False,
+            font={'size': 24, 'color': 'black'},
+            xref="paper",
+            yref="paper"
+        )
+        gauge_anual_bytes = create_plot_bytes(fig_gauge_anual, f"Venta Acumulada USD Anual {self.ANIO_ACTUAL}", 600, 350)
 
         fig_gauge_mensual = go.Figure(go.Indicator(
             mode="gauge+number",
             value=ejecutado_mensual,
             number={'valueformat': '$,.2f', 'font': {'size': 40}},
-            title={'text': f"Venta Acumulada USD Mensual ({self.MES_ACTUAL_NOMBRE})", 'font': {'size': 14}},
-            gauge={'axis': {'range': [0, budget_mensual]}, 'bar': {'color': "#003366"}}
+            gauge={'axis': {'range': [0, budget_mensual]}, 'bar': {'color': "#008000"}}
         ))
-        gauge_mensual_bytes = create_plot_bytes(fig_gauge_mensual, "Gauge Mensual", 600, 350)
+
+        fig_gauge_mensual.add_annotation(
+            x=1.1,
+            y=0.08,
+            text=f'${1.08}mill',
+            showarrow=False,
+            font={'size': 24, 'color': 'black'},
+            xref="paper",
+            yref="paper"
+        )
+        gauge_mensual_bytes = create_plot_bytes(fig_gauge_mensual, f"Venta Acumulada USD Mensual ({self.MES_ACTUAL_NOMBRE})", 600, 350)
 
         # Pie anual y mensual
         fig_anual = go.Figure(data=go.Pie(
@@ -321,7 +355,7 @@ class CarexDashboard:
             values=ventas_sede_anual.values,
             textinfo='value+percent',
             texttemplate='$%{value:,.0f}<br>(%{percent})',
-            insidetextfont={'size': 12, 'color': 'white'},
+            insidetextfont={'size': 20, 'color': 'black'},
             hoverinfo='label+percent+value',
             marker_colors=colores_carex,
             hole=0.45
@@ -329,7 +363,7 @@ class CarexDashboard:
         total_anual = ventas_sede_anual.sum()
         if total_anual > 0:
             fig_anual.add_annotation(text=f"Total<br><b>${total_anual:,.0f}</b>", x=0.5, y=0.5,
-                                    font=dict(size=16, color='#003366'), showarrow=False)
+                                    font=dict(size=16, color='#000000'), showarrow=False)
         pie_anual_bytes = create_plot_bytes(fig_anual, f"Ventas por Sede Anual ({self.ANIO_ACTUAL})", 800, 500)
 
         fig_mensual = go.Figure(data=go.Pie(
@@ -337,7 +371,7 @@ class CarexDashboard:
             values=ventas_sede_mensual.values,
             textinfo='value+percent',
             texttemplate='$%{value:,.0f}<br>(%{percent})',
-            insidetextfont={'size': 12, 'color': 'white'},
+            insidetextfont={'size': 20, 'color': 'black'},
             hoverinfo='label+percent+value',
             marker_colors=colores_carex,
             hole=0.45
@@ -345,7 +379,7 @@ class CarexDashboard:
         total_mensual = ventas_sede_mensual.sum()
         if total_mensual > 0:
             fig_mensual.add_annotation(text=f"Total<br><b>${total_mensual:,.0f}</b>", x=0.5, y=0.5,
-                                      font=dict(size=16, color='#003366'), showarrow=False)
+                                      font=dict(size=16, color='#000000'), showarrow=False)
         pie_mensual_bytes = create_plot_bytes(fig_mensual, f"Ventas por Sede ({self.MES_ACTUAL_NOMBRE})", 800, 500)
 
         # Top paises (bar) anual/mensual
@@ -372,19 +406,19 @@ class CarexDashboard:
         # Tablas top clientes (anual / mensual)
         fig_top_clientes_anual = go.Figure(data=[go.Table(
             header=dict(values=['<b>Cliente</b>', f'<b>Ventas {self.ANIO_ACTUAL} ($)</b>'],
-                        align=['left', 'right'], font=dict(color='white', size=12), fill_color='#003366', height=30),
+                        align=['left', 'right'], font=dict(color='white', size=20), fill_color='#003366', height=30),
             cells=dict(values=[top_clientes_anual.index, [f'${x:,.0f}' for x in top_clientes_anual.values]],
                        align=['left', 'right'], fill_color=[['white', '#f0f0f0'] * (len(top_clientes_anual) // 2 + 1)],
-                       font=dict(color='black', size=11), height=25)
+                       font=dict(color='black', size=16), height=25)
         )])
         tabla_clientes_anual_bytes = create_plot_bytes(fig_top_clientes_anual, f"Top 5 Clientes Anual ({self.ANIO_ACTUAL})", 800, 300)
 
         fig_top_clientes_mensual = go.Figure(data=[go.Table(
             header=dict(values=['<b>Cliente</b>', f'<b>Ventas Mes ({self.MES_ACTUAL_NOMBRE}) ($)</b>'],
-                        align=['left', 'right'], font=dict(color='white', size=12), fill_color='#003366', height=30),
+                        align=['left', 'right'], font=dict(color='white', size=20), fill_color='#003366', height=30),
             cells=dict(values=[top_clientes_mensual.index, [f'${x:,.0f}' for x in top_clientes_mensual.values]],
                        align=['left', 'right'], fill_color=[['white', '#f0f0f0'] * (len(top_clientes_mensual) // 2 + 1)],
-                       font=dict(color='black', size=11), height=25)
+                       font=dict(color='black', size=16), height=25)
         )])
         tabla_clientes_mensual_bytes = create_plot_bytes(fig_top_clientes_mensual, f"Top 5 Clientes ({self.MES_ACTUAL_NOMBRE})", 800, 300)
 

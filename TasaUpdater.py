@@ -12,10 +12,6 @@ class TasaUpdater:
         self.INPUT_FILENAME = "Carex COL Reporte Vendedor.xlsx"
         self.INPUT_PATH = os.path.join(self.DATA_DIR, self.INPUT_FILENAME)
 
-        self.BACKUP_DIR = os.path.join(self.DATA_DIR, "backups")
-        os.makedirs(self.BACKUP_DIR, exist_ok=True)
-
-
     def obtener_tasa_eur_usd(self):
         url = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
         try:
@@ -91,12 +87,3 @@ class TasaUpdater:
             self.actualizar_excel_sin_corromper(self.INPUT_PATH, fecha_actual, cop_usd, eur_usd)
         else:
             print("❌ No se pudieron obtener todas las tasas.")
-
-
-if __name__ == '__main__':
-    try:
-        TasaUpdater(base_dir="C:/Users/aprsistemas/Desktop/trabajo/automatizacion_resportes/").main()
-    except Exception as e:
-        print(f"❌ Error inesperado: {e}")
-    input("Presiona Enter para salir...")
-
